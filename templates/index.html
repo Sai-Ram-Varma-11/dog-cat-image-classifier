@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🐾 Cat vs Dog Classifier</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #8e44ad, #3498db);
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+        }
+        .box {
+            background: rgba(255,255,255,0.15);
+            padding: 30px;
+            border-radius: 20px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+            min-width: 300px;
+        }
+        .upload-area {
+            margin: 20px;
+            padding: 20px;
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 10px;
+        }
+        .upload-area.dragging {
+            border-color: #27ae60;
+            background: rgba(39,174,96,0.1);
+        }
+        input[type=file] {
+            margin: 10px 0;
+        }
+        button {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #219a52;
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            background: #888;
+            cursor: not-allowed;
+        }
+        .prediction {
+            margin-top: 30px;
+            font-size: 32px;
+            font-weight: bold;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .error {
+            color: #ff6b6b;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            margin: 20px 0;
+            font-size: 18px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <h1>🐾 Cat vs Dog Classifier 🐾</h1>
+    <div class="box">
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <div class="upload-area" id="dropZone">
+                <input type="file" name="file" id="fileInput" accept=".jpg,.jpeg,.png,.bmp" required>
+                <br>
+                <button type="submit" id="predictBtn">Predict Image</button>
+            </div>
+        </form>
+
+        <div id="loading" class="loading">
+            Analyzing image... 🔍
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="error">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% if label %}
+            <div class="prediction">
+                {{ label }}
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Show loading state during form submission
+        document.getElementById('uploadForm').onsubmit = function() {
+            document.getElementById('predictBtn').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            return true;
+        };
+
+        // File drag and drop support
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                dropZone.classList.add('dragging');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, e => {
+                e.preventDefault();
+                dropZone.classList.remove('dragging');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', e => {
+            fileInput.files = e.dataTransfer.files;
+        }, false);
+    </script>
+</body>
+</html>
